@@ -2,8 +2,27 @@ import React, { Component } from 'react';
 import Navbar from './components/layout/Navbar';
 import Users from './components/users/Users';
 import './App.css';
+import axios from 'axios';
 
 class App extends Component {
+  state = {
+    // first load ให้เป็น empty array เพื่อไม่ให้ error
+    users: [],
+    loading: false
+  };
+
+  // fetch data from api when first load
+  async componentDidMount() {
+    // first load แสดง spinner รอระหว่าง fetch
+    this.setState({ loading: true });
+
+    const res = await axios.get(`https://api.github.com/users`);
+    // ใช้ .then (จะได้ promises) หรือ async await ก็ได้
+
+    this.setState({ users: res.data, loading: false });
+    console.log(res.data);
+  }
+
   render() {
     return (
       <div>
