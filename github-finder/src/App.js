@@ -16,11 +16,16 @@ class App extends Component {
     // first load แสดง spinner รอระหว่าง fetch
     this.setState({ loading: true });
 
-    const res = await axios.get(`https://api.github.com/users`);
+    // รับ key มาจาก .env.local
+    const res = await axios.get(
+      `https://api.github.com/users?client_id=${
+        process.env.REACT_APP_GITHUB_CLIENT_ID
+      }&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
+    );
     // ใช้ .then (จะได้ promises) หรือ async await ก็ได้
 
+    // after fetch ส่ง data ผ่าน props ไปหา Users
     this.setState({ users: res.data, loading: false });
-    console.log(res.data);
   }
 
   render() {
@@ -28,7 +33,7 @@ class App extends Component {
       <div>
         <Navbar />
         <div className="container">
-          <Users />
+          <Users users={this.state.users} loading={this.state.loading} />
         </div>
       </div>
     );
