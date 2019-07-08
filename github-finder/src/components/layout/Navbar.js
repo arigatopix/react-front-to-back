@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 const Navbar = ({ icon, title }) => {
   return (
@@ -7,6 +8,14 @@ const Navbar = ({ icon, title }) => {
       <h1>
         <i className={icon} /> {title}
       </h1>
+      <ul>
+        <li>
+          <Link to="/">Home</Link>
+        </li>
+        <li>
+          <Link to="/about">About</Link>
+        </li>
+      </ul>
     </nav>
   );
 };
@@ -23,3 +32,8 @@ Navbar.propTypes = {
 };
 
 export default Navbar;
+
+/**
+ * ใช้ Link จาก react-router-dom เพื่อเปลี่ยนหน้า (เปลี่ยน Route ด้วย Switch กับ Route)
+ * ใช้แทน <a> ได้เลย
+ */

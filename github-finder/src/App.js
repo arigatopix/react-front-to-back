@@ -1,9 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import './App.css';
 import Navbar from './components/layout/Navbar';
 import Alert from './components/layout/Alert';
 import Users from './components/users/Users';
 import Search from './components/users/Search';
+import About from './components/pages/About';
 import axios from 'axios';
 
 class App extends Component {
@@ -52,19 +54,32 @@ class App extends Component {
   render() {
     const { users, loading, alert } = this.state;
     return (
-      <div>
-        <Navbar />
-        <div className="container">
-          <Alert alert={alert} />
-          <Search
-            searchUsers={this.searchUsers}
-            clearUsers={this.clearUsers}
-            showClear={users.length > 0 ? true : false}
-            setAlert={this.setAlert}
-          />
-          <Users users={users} loading={loading} />
+      <Router>
+        <div>
+          <Navbar />
+          <div className="container">
+            <Switch>
+              <Route
+                exact
+                path="/"
+                render={() => (
+                  <Fragment>
+                    <Alert alert={alert} />
+                    <Search
+                      searchUsers={this.searchUsers}
+                      clearUsers={this.clearUsers}
+                      showClear={users.length > 0 ? true : false}
+                      setAlert={this.setAlert}
+                    />
+                    <Users users={users} loading={loading} />
+                  </Fragment>
+                )}
+              />
+              <Route path="/about" exact component={About} />
+            </Switch>
+          </div>
         </div>
-      </div>
+      </Router>
     );
   }
 }
@@ -82,4 +97,9 @@ export default App;
  *  - สามารถใช้ JavaScript ใน JSX ได้ โดยใช้ {javascript code}
  *  - สร้าง function ใน function render ไม่ต้องใช้ this
  *  - สร้าง function ใน class ใช้ this.foo() เพื่อชี้ไปยัง object ใน class
+ * ====
+ * react-router-dom :
+ *  - Router ครอบทุก component
+ *  - Switch สำหรับบอกว่า Route แสดงผล render หรือ component แตกต่างไปตาม path
+ *  - อย่าลืม !!! component ต้องครอบด้วย <div> ถ้าไม่ชอบก็ใช้ Fragment
  */
