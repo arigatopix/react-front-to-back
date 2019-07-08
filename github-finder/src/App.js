@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
+import './App.css';
 import Navbar from './components/layout/Navbar';
 import Users from './components/users/Users';
-import './App.css';
+import Search from './components/users/Search';
 import axios from 'axios';
 
 class App extends Component {
@@ -11,28 +12,31 @@ class App extends Component {
     loading: false
   };
 
-  // fetch data from api when first load
-  async componentDidMount() {
-    // first load แสดง spinner รอระหว่าง fetch
+  // helper function
+  searchUsers = async text => {
+    // รับ data จากล่างขึ้นบน จาก Search (ผ่าน arg) > App component (call function)
+    // fetch ข้อมูลจาก github api https://developer.github.com/v3/search/#search-users
+
+    // loading for spinner ..
     this.setState({ loading: true });
 
-    // รับ key มาจาก .env.local
     const res = await axios.get(
-      `https://api.github.com/users?client_id=${
+      `https://api.github.com/search/users?q=${text}&client_id=${
         process.env.REACT_APP_GITHUB_CLIENT_ID
       }&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
     );
-    // ใช้ .then (จะได้ promises) หรือ async await ก็ได้
 
-    // after fetch ส่ง data ผ่าน props ไปหา Users
-    this.setState({ users: res.data, loading: false });
-  }
+    // ส่งข้อมูลจาก api ไป App > Users > UserItem
+    // เมื่อ fetch จะได้ object ซึ่ง users อยู่ใน items property จึงต้องใช้ users: res.data.item
+    this.setState({ users: res.data.items, loading: false });
+  };
 
   render() {
     return (
       <div>
         <Navbar />
         <div className="container">
+          <Search searchUsers={this.searchUsers} />
           <Users users={this.state.users} loading={this.state.loading} />
         </div>
       </div>
