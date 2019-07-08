@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import Navbar from './components/layout/Navbar';
+import Alert from './components/layout/Alert';
 import Users from './components/users/Users';
 import Search from './components/users/Search';
 import axios from 'axios';
@@ -9,10 +10,11 @@ class App extends Component {
   state = {
     // first load ให้เป็น empty array เพื่อไม่ให้ error
     users: [],
-    loading: false
+    loading: false,
+    alert: null
   };
 
-  // helper function
+  // * helper function
   searchUsers = async text => {
     // รับ data จากล่างขึ้นบน จาก Search (ผ่าน arg) > App component (call function)
     // fetch ข้อมูลจาก github api https://developer.github.com/v3/search/#search-users
@@ -31,13 +33,36 @@ class App extends Component {
     this.setState({ users: res.data.items, loading: false });
   };
 
+  // * Clear Users from state ต้อง clear จาก Search component
+  clearUsers = () => {
+    // กด clear ปุ้บ users ให้เป็น empty array
+    this.setState({ users: [], loading: false });
+  };
+
+  // * Show Alert
+  setAlert = (msg, type) => {
+    // รับ msg กับ type จาก child component
+    // ส่ง state ไปหา Alert Component เพื่อแสดงผล
+    this.setState({ alert: { msg, type } });
+
+    // เอา alert ออก
+    setTimeout(() => this.setState({ alert: null }), 3000);
+  };
+
   render() {
+    const { users, loading, alert } = this.state;
     return (
       <div>
         <Navbar />
         <div className="container">
-          <Search searchUsers={this.searchUsers} />
-          <Users users={this.state.users} loading={this.state.loading} />
+          <Alert alert={alert} />
+          <Search
+            searchUsers={this.searchUsers}
+            clearUsers={this.clearUsers}
+            showClear={users.length > 0 ? true : false}
+            setAlert={this.setAlert}
+          />
+          <Users users={users} loading={loading} />
         </div>
       </div>
     );
