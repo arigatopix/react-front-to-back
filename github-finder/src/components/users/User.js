@@ -1,18 +1,22 @@
 import React, { Component, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import Repos from '../repos/Repos';
 import Spinner from '../layout/Spinner';
 
 class User extends Component {
   // fetch user โดยส่งจาก User (child) > App (Parent)
   componentDidMount() {
     this.props.getUser(this.props.match.params.login);
+    this.props.getUserRepos(this.props.match.params.login);
   }
 
   static propTypes = {
     user: PropTypes.object.isRequired,
+    repos: PropTypes.array.isRequired,
     loading: PropTypes.bool.isRequired,
-    getUser: PropTypes.func.isRequired
+    getUser: PropTypes.func.isRequired,
+    getUserRepos: PropTypes.func.isRequired
   };
 
   render() {
@@ -35,7 +39,7 @@ class User extends Component {
       hireable
     } = this.props.user;
 
-    const { loading } = this.props;
+    const { loading, repos } = this.props;
 
     // Wait to fetch data
     if (loading) {
@@ -109,9 +113,19 @@ class User extends Component {
           <div className="badge badge-light">Public Repos: {public_repos}</div>
           <div className="badge badge-dark">Public Gists: {public_gists}</div>
         </div>
+        <Repos repos={repos} />
       </Fragment>
     );
   }
 }
 
 export default User;
+
+/**
+ * getUserRepos
+ *  1) รับ username แล้วส่งไปให้ App (parent)
+ *  2) fetch repos จาก App ส่ง state repos ผ่าน props
+ *    - set propstype ทั้ง getUserRepos และ repos
+ *  3) ส่ง state ลงไปให้ Repos
+ *  4) ส่ง state เพื่อ render Repo ใน RepoItem
+ */

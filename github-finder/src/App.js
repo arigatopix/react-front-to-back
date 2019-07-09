@@ -15,6 +15,7 @@ class App extends Component {
     // user เป็น {} empty object เพราะเราเรียกข้อมูลเป็น object จาก api
     users: [],
     user: {},
+    repos: [],
     loading: false,
     alert: null
   };
@@ -54,6 +55,20 @@ class App extends Component {
     // this.state.user ได้ Object ส่ง Object user ผ่าน props
   };
 
+  // Get user repos
+  // ! อย่าลืมตั้ง state ... และส่ง state ผ่าน props ... อย่าลืม !! Destructuring
+  getUserRepos = async username => {
+    this.setState({ loading: true });
+
+    const res = await axios.get(
+      `https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&?client_id=${
+        process.env.REACT_APP_GITHUB_CLIENT_ID
+      }&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
+    );
+
+    this.setState({ repos: res.data, loading: false });
+  };
+
   // * Clear Users from state ต้อง clear จาก Search component
   clearUsers = () => {
     // กด clear ปุ้บ users ให้เป็น empty array
@@ -72,7 +87,7 @@ class App extends Component {
 
   render() {
     // Destructuring STATE
-    const { users, user, loading, alert } = this.state;
+    const { users, user, repos, loading, alert } = this.state;
 
     return (
       <Router>
@@ -104,7 +119,9 @@ class App extends Component {
                     {...props}
                     loading={loading}
                     getUser={this.getUser}
+                    getUserRepos={this.getUserRepos}
                     user={user}
+                    repos={repos}
                   />
                 )}
               />
@@ -143,7 +160,7 @@ export default App;
  * - Route ตรง User component เราต้องการส่งข้อมูลผ่าน props และยังต้องใช้ Route จึงต้องใช้ render={(props) => (<User />)} props แทนที่จะเป็น component={User}
  *  - ปกติถ้าใช้ component จะส่งผ่าน variable :login ผ่าน props ได้เลย แต่ตอนนี้เราต้องการส่ง state (user, loading) ผ่านลงไปที่ User ด้วยจึงต้องกำหนด spread operations
  *  - render={(props) => (<User { ...props }/>)}
- *  - { ...props } ... ใน User component จะเรียก variable(ที่พิมพ์มาใน url) ผ่าน this.props.match.params.login
+ *  - { ...props } ... ใน User component จะเรียก variable(ที่พิมพ์มาใน url) ผ่าน this.props.match.params.login และมี props อื่นๆ ที่ต้องเรียก เช่น props.location จึงใช้ Spread operations
  *  - getUser เป็น callback function โดยรับ username มาจาก child ..params.login
  *  - user คือส่ง state จาก App (Parent) ให้ User (child)
  * ====
