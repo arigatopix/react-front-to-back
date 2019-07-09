@@ -4,6 +4,7 @@ import './App.css';
 import Navbar from './components/layout/Navbar';
 import Alert from './components/layout/Alert';
 import Users from './components/users/Users';
+import User from './components/users/User';
 import Search from './components/users/Search';
 import About from './components/pages/About';
 import axios from 'axios';
@@ -11,28 +12,46 @@ import axios from 'axios';
 class App extends Component {
   state = {
     // first load ให้เป็น empty array เพื่อไม่ให้ error
+    // user เป็น {} empty object เพราะเราเรียกข้อมูลเป็น object จาก api
     users: [],
+    user: {},
     loading: false,
     alert: null
   };
 
-  // * helper function
+  // * Search Users รับข้อมูลจาก input
   searchUsers = async text => {
     // รับ data จากล่างขึ้นบน จาก Search (ผ่าน arg) > App component (call function)
     // fetch ข้อมูลจาก github api https://developer.github.com/v3/search/#search-users
 
-    // loading for spinner ..
+    // 1) loading for spinner ..
     this.setState({ loading: true });
 
+    // 2) fetch ข้อมูลจาก api
     const res = await axios.get(
       `https://api.github.com/search/users?q=${text}&client_id=${
         process.env.REACT_APP_GITHUB_CLIENT_ID
       }&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
     );
 
-    // ส่งข้อมูลจาก api ไป App > Users > UserItem
+    // ส่ง state ผ่าน prop .. App > Users > UserItem
     // เมื่อ fetch จะได้ object ซึ่ง users อยู่ใน items property จึงต้องใช้ users: res.data.item
     this.setState({ users: res.data.items, loading: false });
+  };
+
+  // Get single github user
+  getUser = async username => {
+    // รับ username จาก Users component
+    this.setState({ loading: true });
+
+    const res = await axios.get(
+      `https://api.github.com/users/${username}?client_id=${
+        process.env.REACT_APP_GITHUB_CLIENT_ID
+      }&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
+    );
+
+    this.setState({ user: res.data, loading: false });
+    // this.state.user ได้ Object ส่ง Object user ผ่าน props
   };
 
   // * Clear Users from state ต้อง clear จาก Search component
@@ -52,7 +71,9 @@ class App extends Component {
   };
 
   render() {
-    const { users, loading, alert } = this.state;
+    // Destructuring STATE
+    const { users, user, loading, alert } = this.state;
+
     return (
       <Router>
         <div>
@@ -62,7 +83,7 @@ class App extends Component {
               <Route
                 exact
                 path="/"
-                render={() => (
+                render={props => (
                   <Fragment>
                     <Alert alert={alert} />
                     <Search
@@ -73,6 +94,18 @@ class App extends Component {
                     />
                     <Users users={users} loading={loading} />
                   </Fragment>
+                )}
+              />
+              <Route
+                path="/user/:login"
+                exact
+                render={props => (
+                  <User
+                    {...props}
+                    loading={loading}
+                    getUser={this.getUser}
+                    user={user}
+                  />
                 )}
               />
               <Route path="/about" exact component={About} />
@@ -99,7 +132,21 @@ export default App;
  *  - สร้าง function ใน class ใช้ this.foo() เพื่อชี้ไปยัง object ใน class
  * ====
  * react-router-dom :
- *  - Router ครอบทุก component
- *  - Switch สำหรับบอกว่า Route แสดงผล render หรือ component แตกต่างไปตาม path
+ *  - Router ครอบทุก component เพื่อบอกว่าจะใช้ react-router-dom ตัวนี้จะดู path หลัง localhost
+ *  - Route บอก path ที่จะไป และให้แสดงผลอะไร เช่น component
+ *    - ตรง Route อันแรก ..
+ *        - คำสั่ง render คือ render JSX หรือแสดง JSX จาก component ให้ใช้คำสั่ง component={JSXcomponent} แทน
+ *        - คำสั่ง render ต้องผ่าน arrow function ถ้ามี nested
+ *        - https://reacttraining.com/react-router/core/api/Route/render-func
+ *        - กรณีมี variable หลัง path เช่น /user/:login โดย :login ส่งผ่านให้ child props .. this.props.match.param.login
+ * ====
+ * - Route ตรง User component เราต้องการส่งข้อมูลผ่าน props และยังต้องใช้ Route จึงต้องใช้ render={(props) => (<User />)} props แทนที่จะเป็น component={User}
+ *  - ปกติถ้าใช้ component จะส่งผ่าน variable :login ผ่าน props ได้เลย แต่ตอนนี้เราต้องการส่ง state (user, loading) ผ่านลงไปที่ User ด้วยจึงต้องกำหนด spread operations
+ *  - render={(props) => (<User { ...props }/>)}
+ *  - { ...props } ... ใน User component จะเรียก variable(ที่พิมพ์มาใน url) ผ่าน this.props.match.params.login
+ *  - getUser เป็น callback function โดยรับ username มาจาก child ..params.login
+ *  - user คือส่ง state จาก App (Parent) ให้ User (child)
+ * ====
+ *  - Switch ใช้เพื่อแสดงผล Route อันใดอันหนึ่ง เพราะปกติ Route พยายามแสดงผล component ตามที่ path บอก เช่น path="/" กับ path="/about" จะแสดงผล component ทั้ง / และ about
  *  - อย่าลืม !!! component ต้องครอบด้วย <div> ถ้าไม่ชอบก็ใช้ Fragment
  */
