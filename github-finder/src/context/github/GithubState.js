@@ -12,3 +12,12 @@ import {
   SET_ALERT,
   REMOVE_ALERT
 } from '../types';
+
+const GithubState = props => {
+  const initState = {
+    users: [],
+    user: {},
+    repos: [],
+    loading: false
+  };
+};
