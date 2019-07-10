@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import './App.css';
 import Navbar from './components/layout/Navbar';
@@ -9,41 +9,36 @@ import Search from './components/users/Search';
 import About from './components/pages/About';
 import axios from 'axios';
 
-class App extends Component {
-  state = {
-    // first load ให้เป็น empty array เพื่อไม่ให้ error
-    // user เป็น {} empty object เพราะเราเรียกข้อมูลเป็น object จาก api
-    users: [],
-    user: {},
-    repos: [],
-    loading: false,
-    alert: null
-  };
+const App = () => {
+  const [users, setUsers] = useState([]);
+  const [user, setUser] = useState({});
+  const [repos, setUserRepos] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState(null);
 
-  // * Search Users รับข้อมูลจาก input
-  searchUsers = async text => {
-    // รับ data จากล่างขึ้นบน จาก Search (ผ่าน arg) > App component (call function)
-    // fetch ข้อมูลจาก github api https://developer.github.com/v3/search/#search-users
+  // * Search Users รับข้อมูลจาก Users component (input)
+  const searchUsers = async text => {
+    // fetch ข้อมูลจาก github api
 
     // 1) loading for spinner ..
-    this.setState({ loading: true });
+    setLoading(true);
 
-    // 2) fetch ข้อมูลจาก api
+    // 2) fetch ข้อมูลจาก api https://developer.github.com/v3/search/#search-users
     const res = await axios.get(
       `https://api.github.com/search/users?q=${text}&client_id=${
         process.env.REACT_APP_GITHUB_CLIENT_ID
       }&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
     );
 
-    // ส่ง state ผ่าน prop .. App > Users > UserItem
-    // เมื่อ fetch จะได้ object ซึ่ง users อยู่ใน items property จึงต้องใช้ users: res.data.item
-    this.setState({ users: res.data.items, loading: false });
+    // เมื่อ fetch จะได้ object ซึ่ง users อยู่ใน items property จึงต้องใช้ users: res.data.items
+    setUsers(res.data.items);
+    setLoading(false);
   };
 
   // Get single github user
-  getUser = async username => {
+  const getUser = async username => {
     // รับ username จาก Users component
-    this.setState({ loading: true });
+    setLoading(true);
 
     const res = await axios.get(
       `https://api.github.com/users/${username}?client_id=${
@@ -51,14 +46,13 @@ class App extends Component {
       }&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
     );
 
-    this.setState({ user: res.data, loading: false });
-    // this.state.user ได้ Object ส่ง Object user ผ่าน props
+    setUser(res.data);
+    setLoading(false);
   };
 
   // Get user repos
-  // ! อย่าลืมตั้ง state ... และส่ง state ผ่าน props ... อย่าลืม !! Destructuring
-  getUserRepos = async username => {
-    this.setState({ loading: true });
+  const getUserRepos = async username => {
+    setLoading(true);
 
     const res = await axios.get(
       `https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&?client_id=${
@@ -66,73 +60,70 @@ class App extends Component {
       }&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
     );
 
-    this.setState({ repos: res.data, loading: false });
+    setUserRepos(res.data);
+    setLoading(false);
   };
 
-  // * Clear Users from state ต้อง clear จาก Search component
-  clearUsers = () => {
+  // Clear Users from state ต้อง clear จาก Search component
+  const clearUsers = () => {
     // กด clear ปุ้บ users ให้เป็น empty array
-    this.setState({ users: [], loading: false });
+    setUsers([]);
   };
 
-  // * Show Alert
-  setAlert = (msg, type) => {
-    // รับ msg กับ type จาก child component
+  // Show Alert
+  const showAlert = (msg, type) => {
+    // รับ msg กับ type จาก Users (child component)
     // ส่ง state ไปหา Alert Component เพื่อแสดงผล
-    this.setState({ alert: { msg, type } });
+    // ! ต้องส่งไปเป็น object
+    setAlert({ msg, type });
 
     // เอา alert ออก
-    setTimeout(() => this.setState({ alert: null }), 3000);
+    setTimeout(() => setAlert(null), 3000);
   };
 
-  render() {
-    // Destructuring STATE
-    const { users, user, repos, loading, alert } = this.state;
-
-    return (
-      <Router>
-        <div>
-          <Navbar />
-          <div className="container">
-            <Switch>
-              <Route
-                exact
-                path="/"
-                render={props => (
-                  <Fragment>
-                    <Alert alert={alert} />
-                    <Search
-                      searchUsers={this.searchUsers}
-                      clearUsers={this.clearUsers}
-                      showClear={users.length > 0 ? true : false}
-                      setAlert={this.setAlert}
-                    />
-                    <Users users={users} loading={loading} />
-                  </Fragment>
-                )}
-              />
-              <Route
-                path="/user/:login"
-                exact
-                render={props => (
-                  <User
-                    {...props}
-                    loading={loading}
-                    getUser={this.getUser}
-                    getUserRepos={this.getUserRepos}
-                    user={user}
-                    repos={repos}
+  return (
+    <Router>
+      <div>
+        <Navbar />
+        <div className="container">
+          <Switch>
+            <Route
+              exact
+              path="/"
+              render={props => (
+                <Fragment>
+                  <Alert alert={alert} />
+                  <Search
+                    searchUsers={searchUsers}
+                    clearUsers={clearUsers}
+                    showClear={users.length > 0 ? true : false}
+                    showAlert={showAlert}
                   />
-                )}
-              />
-              <Route path="/about" exact component={About} />
-            </Switch>
-          </div>
+                  <Users users={users} loading={loading} />
+                </Fragment>
+              )}
+            />
+            <Route
+              path="/user/:login"
+              exact
+              render={props => (
+                <User
+                  {...props}
+                  loading={loading}
+                  getUser={getUser}
+                  getUserRepos={getUserRepos}
+                  user={user}
+                  repos={repos}
+                />
+              )}
+            />
+            <Route path="/about" exact component={About} />
+          </Switch>
         </div>
-      </Router>
-    );
-  }
-}
+      </div>
+    </Router>
+  );
+};
 
 export default App;
 

@@ -1,67 +1,64 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-class Search extends Component {
-  state = {
-    text: ''
-  };
-
-  static PropType = {
-    searchUsers: PropTypes.func.isRequired,
-    clearUsers: PropTypes.func.isRequired,
-    showClear: PropTypes.func.isRequired,
-    setAlert: PropTypes.func.isRequired
-  };
+const Search = ({ clearUsers, showClear, showAlert, searchUsers }) => {
+  // * ตั้งค่าแทน state (ส่วนหนึ่งของ Hooks)
+  const [text, setText] = useState('');
+  // โดย text คือ state ปัจจุบัน
+  // setText = เป็น function คล้ายๆ กับ setState({ text: ... })
 
   // รับ event จาก tag input ต้องสร้าง function เอง
-  onChange = e => {
-    // รับ value จาก input tag
-    // กรณีมี name ใน input tag หลายอันมาก สามารถแทน key ของ state เป็น javascript ปกติคือ [e.target.name] ถ้า name ใน tag เป็น email ... key ของ setState ก็จะเป็น email
-    this.setState({ [e.target.name]: e.target.value });
+  const onChange = e => {
+    // event handler รับ input จาก <input>
+    setText(e.target.value);
   };
 
-  onSubmit = e => {
+  const onSubmit = e => {
     // ป้องกัน behavior ไม่ให้ส่ง submit และ reload page
     e.preventDefault();
 
-    if (!this.state.text) {
-      // ถ้า input เป็น empty
-      this.props.setAlert('Please enter somthing.', 'ligth');
+    if (!text) {
+      // ถ้า input เป็น empty (ดูจาก state ปัจจุบัน)
+      showAlert('Please enter somthing.', 'ligth');
     } else {
       // ทำหน้าที่รับ value แล้วส่งให้ Parent Component ผ่าน props
-      this.props.searchUsers(this.state.text);
-      this.setState({ text: '' });
+      searchUsers(text);
+      setText('');
     }
   };
 
-  render() {
-    const { clearUsers, showClear } = this.props;
+  return (
+    <div>
+      <form className="form" onSubmit={onSubmit}>
+        <input
+          type="text"
+          name="text"
+          placeholder="Search Users..."
+          value={text}
+          onChange={onChange}
+        />
+        <input
+          type="submit"
+          value="Search"
+          className="btn btn-dark btn-block"
+        />
+      </form>
+      {showClear && (
+        <button className="btn btn-light btn-block" onClick={clearUsers}>
+          Clear
+        </button>
+      )}
+    </div>
+  );
+};
 
-    return (
-      <div>
-        <form className="form" onSubmit={this.onSubmit}>
-          <input
-            type="text"
-            name="text"
-            placeholder="Search Users..."
-            value={this.state.text}
-            onChange={this.onChange}
-          />
-          <input
-            type="submit"
-            value="Search"
-            className="btn btn-dark btn-block"
-          />
-        </form>
-        {showClear && (
-          <button className="btn btn-light btn-block" onClick={clearUsers}>
-            Clear
-          </button>
-        )}
-      </div>
-    );
-  }
-}
+// Proptype เป็น prototype chain
+Search.PropType = {
+  searchUsers: PropTypes.func.isRequired,
+  clearUsers: PropTypes.func.isRequired,
+  showClear: PropTypes.func.isRequired,
+  showAlert: PropTypes.func.isRequired
+};
 
 export default Search;
 
