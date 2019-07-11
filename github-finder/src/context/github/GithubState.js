@@ -14,6 +14,7 @@ import {
 } from '../types';
 
 const GithubState = props => {
+  // รับจาก Child component
   const initState = {
     users: [],
     user: {},

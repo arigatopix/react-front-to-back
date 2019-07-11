@@ -8,33 +8,36 @@ import User from './components/users/User';
 import Search from './components/users/Search';
 import About from './components/pages/About';
 import GithubState from './context/github/GithubState';
+import AlertState from './context/alert/AlertState';
 // GithubState ต้อง Wrap ทุก Component เพื่อส่ง State ผ่าน Context
 
 const App = () => {
   return (
     <GithubState>
-      <Router>
-        <div>
-          <Navbar />
-          <div className="container">
-            <Switch>
-              <Route
-                exact
-                path="/"
-                render={props => (
-                  <Fragment>
-                    <Alert />
-                    <Search />
-                    <Users />
-                  </Fragment>
-                )}
-              />
-              <Route path="/user/:login" exact component={User} />
-              <Route path="/about" exact component={About} />
-            </Switch>
+      <AlertState>
+        <Router>
+          <div>
+            <Navbar />
+            <div className="container">
+              <Switch>
+                <Route
+                  exact
+                  path="/"
+                  render={props => (
+                    <Fragment>
+                      <Alert />
+                      <Search />
+                      <Users />
+                    </Fragment>
+                  )}
+                />
+                <Route path="/user/:login" exact component={User} />
+                <Route path="/about" exact component={About} />
+              </Switch>
+            </div>
           </div>
-        </div>
-      </Router>
+        </Router>
+      </AlertState>
     </GithubState>
   );
 };

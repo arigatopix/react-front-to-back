@@ -1,9 +1,12 @@
 import React, { useContext } from 'react';
-import GithubContext from '../../context/github/githubContext';
+import AlertContext from '../../context/alert/alertContext';
 
 const Alert = () => {
-  const githubContext = useContext(GithubContext);
-  const { alert } = githubContext;
+  // ใช้ state ผ่าน Context คล้ายของ Stephen สอนคือเรียกโดยใช้ alertContext = this.context.alert
+  const alertContext = useContext(AlertContext);
+
+  // Destructuring ปกติจะใช้งานคือ alertContext.alert.type
+  const { alert } = alertContext;
 
   // รับ state ผ่าน props
   return (

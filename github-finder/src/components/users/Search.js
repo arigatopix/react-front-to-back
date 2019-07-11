@@ -1,10 +1,13 @@
 import React, { useState, useContext } from 'react';
+import AlertContext from '../../context/alert/alertContext';
 import GithubContext from '../../context/github/githubContext';
 
 const Search = () => {
   // * รับข้อมูลจาก Context !!
   const githubContext = useContext(GithubContext);
-  const { users, clearUsers, showAlert } = githubContext;
+  const alertContext = useContext(AlertContext);
+  const { users, clearUsers, searchUsers } = githubContext;
+  const { setAlert } = alertContext;
 
   // * ตั้งค่าแทน state (ส่วนหนึ่งของ Hooks)
   const [text, setText] = useState('');
@@ -23,10 +26,10 @@ const Search = () => {
 
     if (!text) {
       // ถ้า input เป็น empty (ดูจาก state ปัจจุบัน)
-      showAlert('Please enter somthing.', 'ligth');
+      setAlert('Please enter somthing.', 'ligth');
     } else {
       // ทำหน้าที่รับ value แล้วส่งให้ Parent Component ผ่าน props
-      githubContext.searchUsers(text);
+      searchUsers(text);
       setText('');
     }
   };
