@@ -30,9 +30,14 @@ const App = () => {
       }&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
     );
 
-    // เมื่อ fetch จะได้ object ซึ่ง users อยู่ใน items property จึงต้องใช้ users: res.data.items
-    setUsers(res.data.items);
-    setLoading(false);
+    if (res.data.items.length > 0) {
+      setUsers(res.data.items);
+      setLoading(false);
+    } else {
+      // fetch แล้วไม่เจอ users
+      showAlert("Can't find users", 'light');
+      setLoading(false);
+    }
   };
 
   // Get single github user
