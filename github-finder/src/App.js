@@ -35,7 +35,7 @@ const App = () => {
       setLoading(false);
     } else {
       // fetch แล้วไม่เจอ users
-      showAlert("Can't find users", 'light');
+      showAlert('User not found.', 'light');
       setLoading(false);
     }
   };
