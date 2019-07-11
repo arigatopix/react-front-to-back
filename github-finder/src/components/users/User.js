@@ -1,15 +1,16 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import Repos from '../repos/Repos';
 import Spinner from '../layout/Spinner';
+import GithubContext from '../../context/github/githubContext';
 
-const User = ({ user, loading, repos, getUser, getUserRepos, match }) => {
-  // fetch data from api
+const User = ({ match }) => {
+  // ใช้ Context API ในการส่ง State
+  const githubContext = useContext(GithubContext);
+  // Destructuring Context Object
+  const { user, loading, getUser, getUserRepos, repos } = githubContext;
+
   useEffect(() => {
-    // * useEffect ใช้แทน componentDidMout เพื่อ fetch ข้อมูล
-    // * อย่าลืม มันเป็น function ใน () => {} จะต้องเป็น function ที่ fetch ข้อมูลเสร็จแล้ว
-    // * arg ที่สองจะต้องเป็น array ตรวจสอบการเปลี่ยนแปลง (rerender)
     getUser(match.params.login);
     getUserRepos(match.params.login);
     // eslint-disable-next-line
@@ -107,14 +108,6 @@ const User = ({ user, loading, repos, getUser, getUserRepos, match }) => {
       <Repos repos={repos} />
     </Fragment>
   );
-};
-
-User.propTypes = {
-  user: PropTypes.object.isRequired,
-  repos: PropTypes.array.isRequired,
-  loading: PropTypes.bool.isRequired,
-  getUser: PropTypes.func.isRequired,
-  getUserRepos: PropTypes.func.isRequired
 };
 
 export default User;

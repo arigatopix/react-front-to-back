@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import GithubContext from '../../context/github/githubContext';
 
-const Alert = ({ alert }) => {
+const Alert = () => {
+  const githubContext = useContext(GithubContext);
+  const { alert } = githubContext;
+
   // รับ state ผ่าน props
   return (
     alert !== null && (

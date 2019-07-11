@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import UserItem from './UserItem';
 import Spinner from '../layout/Spinner';
-import PropTypes from 'prop-types';
+import GithubContext from '../../context/github/githubContext';
 
-const Users = ({ users, loading }) => {
+const Users = () => {
+  // ใช้ ข้อมูลจาก Context
+  const githubContext = useContext(GithubContext);
+
+  // destructuring จากเดิม githubContext.user และ githubContext.loading
+  const { users, loading } = githubContext;
+
   if (loading) {
     return (
       <div>
@@ -21,12 +27,6 @@ const Users = ({ users, loading }) => {
   }
 };
 
-// PropTypes เอาไว้เช็ค incomming ได้ด้วย
-Users.propTypes = {
-  users: PropTypes.array.isRequired,
-  loading: PropTypes.bool.isRequired
-};
-
 // ตั้งค่า style อยู่นอก class
 const userStyle = {
   // setting object
@@ -36,5 +36,3 @@ const userStyle = {
 };
 
 export default Users;
-
-// สร้าง style ของแต่ละ component ได้จาก userStyle ใน JSX ใช้ {}

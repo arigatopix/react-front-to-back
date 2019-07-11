@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import './App.css';
 import Navbar from './components/layout/Navbar';
@@ -7,126 +7,35 @@ import Users from './components/users/Users';
 import User from './components/users/User';
 import Search from './components/users/Search';
 import About from './components/pages/About';
-import axios from 'axios';
+import GithubState from './context/github/GithubState';
+// GithubState ต้อง Wrap ทุก Component เพื่อส่ง State ผ่าน Context
 
 const App = () => {
-  const [users, setUsers] = useState([]);
-  const [user, setUser] = useState({});
-  const [repos, setUserRepos] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState(null);
-
-  // * Search Users รับข้อมูลจาก Users component (input)
-  const searchUsers = async text => {
-    // fetch ข้อมูลจาก github api
-
-    // 1) loading for spinner ..
-    setLoading(true);
-
-    // 2) fetch ข้อมูลจาก api https://developer.github.com/v3/search/#search-users
-    const res = await axios.get(
-      `https://api.github.com/search/users?q=${text}&client_id=${
-        process.env.REACT_APP_GITHUB_CLIENT_ID
-      }&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
-    );
-
-    if (res.data.items.length > 0) {
-      setUsers(res.data.items);
-      setLoading(false);
-    } else {
-      // fetch แล้วไม่เจอ users
-      showAlert('User not found.', 'light');
-      setLoading(false);
-    }
-  };
-
-  // Get single github user
-  const getUser = async username => {
-    // รับ username จาก Users component
-    setLoading(true);
-
-    const res = await axios.get(
-      `https://api.github.com/users/${username}?client_id=${
-        process.env.REACT_APP_GITHUB_CLIENT_ID
-      }&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
-    );
-
-    setUser(res.data);
-    setLoading(false);
-  };
-
-  // Get user repos
-  const getUserRepos = async username => {
-    setLoading(true);
-
-    const res = await axios.get(
-      `https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&?client_id=${
-        process.env.REACT_APP_GITHUB_CLIENT_ID
-      }&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
-    );
-
-    setUserRepos(res.data);
-    setLoading(false);
-  };
-
-  // Clear Users from state ต้อง clear จาก Search component
-  const clearUsers = () => {
-    // กด clear ปุ้บ users ให้เป็น empty array
-    setUsers([]);
-  };
-
-  // Show Alert
-  const showAlert = (msg, type) => {
-    // รับ msg กับ type จาก Users (child component)
-    // ส่ง state ไปหา Alert Component เพื่อแสดงผล
-    // ! ต้องส่งไปเป็น object
-    setAlert({ msg, type });
-
-    // เอา alert ออก
-    setTimeout(() => setAlert(null), 3000);
-  };
-
   return (
-    <Router>
-      <div>
-        <Navbar />
-        <div className="container">
-          <Switch>
-            <Route
-              exact
-              path="/"
-              render={props => (
-                <Fragment>
-                  <Alert alert={alert} />
-                  <Search
-                    searchUsers={searchUsers}
-                    clearUsers={clearUsers}
-                    showClear={users.length > 0 ? true : false}
-                    showAlert={showAlert}
-                  />
-                  <Users users={users} loading={loading} />
-                </Fragment>
-              )}
-            />
-            <Route
-              path="/user/:login"
-              exact
-              render={props => (
-                <User
-                  {...props}
-                  loading={loading}
-                  getUser={getUser}
-                  getUserRepos={getUserRepos}
-                  user={user}
-                  repos={repos}
-                />
-              )}
-            />
-            <Route path="/about" exact component={About} />
-          </Switch>
+    <GithubState>
+      <Router>
+        <div>
+          <Navbar />
+          <div className="container">
+            <Switch>
+              <Route
+                exact
+                path="/"
+                render={props => (
+                  <Fragment>
+                    <Alert />
+                    <Search />
+                    <Users />
+                  </Fragment>
+                )}
+              />
+              <Route path="/user/:login" exact component={User} />
+              <Route path="/about" exact component={About} />
+            </Switch>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </GithubState>
   );
 };
 
