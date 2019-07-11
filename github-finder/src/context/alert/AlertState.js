@@ -6,9 +6,8 @@ import { SET_ALERT, REMOVE_ALERT } from '../types';
 // Init State & Action Creator
 const AlertState = props => {
   // props ใช้ใน Context.Provider Component
-  const initState = {
-    alert: null
-  };
+  const initState = null;
+  // ทั้งหมดเป็น null ได้เลย เพราะมี object alert อย่างเดียว
 
   // *** Current state กับ ส่ง action ผ่าน dispatch method ให้กับ reducer
   const [state, dispatch] = useReducer(AlertReducer, initState);
@@ -40,7 +39,7 @@ const AlertState = props => {
     <AlertContext.Provider
       value={{
         setAlert,
-        alert: state.alert
+        alert: state
       }}
     >
       {props.children}
