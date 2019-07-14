@@ -25,10 +25,44 @@ router.get('/', auth, async (req, res) => {
 
 // @route   POST api/auth : ใช้ endpoint เดียวกันแต่คนละ Method
 // @desc    Auth user and get Token
-// @access  Private
-router.post('/', (req, res) => {
-  res.send('Add contact');
-});
+// @access  Private .. ต้องใช้ auth จาก middleware และ express validator ใช้ array
+router.post(
+  '/',
+  [
+    auth,
+    [
+      check('name', 'Name is required.')
+        .not()
+        .isEmpty()
+    ]
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { name, email, phone, type } = req.body;
+
+    try {
+      const newContact = new Contact({
+        name,
+        email,
+        phone,
+        type,
+        user: req.user.id // ใช้ user foreign key จาก middleware
+      });
+
+      const contact = await newContact.save();
+
+      // อย่าลืมส่งให้ client ด้วย ไม่งั้นรอไปเหอะ
+      res.json(contact);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+    }
+  }
+);
 
 // @route   PUT api/auth/:id ** PUT PATCH DELETE ต้องระบุ User
 // @desc    Auth user and get Token
