@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 const { check, validationResult } = require('express-validator');
 // lib ช่วยเช็ค field ที่ input เข้ามา
 // https://express-validator.github.io/docs/
@@ -59,7 +61,26 @@ router.post(
 
       await user.save();
 
-      res.send('User saved');
+      // send to token
+      const payload = {
+        // บางส่วนของ jwt ใช้ user.id ในการสร้าง token
+        user: {
+          id: user.id
+        }
+      };
+
+      jwt.sign(
+        payload,
+        config.get('jwtSecret'),
+        {
+          expiresIn: 360000
+        },
+        (err, token) => {
+          if (err) throw err; // ถ้ามี error
+          res.json({ token }); // ถ้าผ่าน return token ให้กับ client
+          // * ไม่เก็บใน database
+        }
+      );
     } catch (error) {
       // จะ error เมื่อ Server มีปัญหา
 
