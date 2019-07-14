@@ -67,8 +67,40 @@ router.post(
 // @route   PUT api/auth/:id ** PUT PATCH DELETE ต้องระบุ User
 // @desc    Auth user and get Token
 // @access  Private
-router.put('/:id', (req, res) => {
-  res.send('Update contact');
+router.put('/:id', auth, async (req, res) => {
+  const { name, email, phone, type } = req.body;
+
+  // Build contact object
+  const contactFields = {};
+  if (name) contactFields.name = name;
+  if (email) contactFields.email = email;
+  if (phone) contactFields.phone = phone;
+  if (type) contactFields.type = type;
+
+  try {
+    // หาจาก parameter /:id
+    let contact = await Contact.findById(req.params.id);
+
+    if (!contact) return res.status(400).json({ msg: 'Contact not found' });
+
+    if (contact.user.toString() !== req.user.id) {
+      // เช็คว่า user เป็นเจ้าของ contact
+      // contact.user ไม่ใช่ string เลยต้องปรับ (เด่ว type error)
+      return res.status(401).json({ msg: 'Not authorized' });
+    }
+
+    // update in database
+    contact = await Contact.findByIdAndUpdate(
+      req.params.id,
+      { $set: contactFields },
+      { new: true }
+    ); // existed create
+
+    res.json(contact);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
 });
 
 // @route   DELETE api/auth/:id ** PUT PATCH DELETE ต้องระบุ User
