@@ -6,6 +6,10 @@ const app = express();
 // Connect Database
 connectDB();
 
+// Init Middleware
+// เพราะเวลาสื่อสารระหว่าง client กับ server (TCP/IP) จะส่งข้อมูลเป็นก้อนๆ จึงต้องมี parserBody เป็นตัวรวม
+app.use(express.json({ extended: false }));
+
 app.get('/', (req, res) =>
   res.json({ msg: 'Welcome to the Contact Kepper API' })
 );
