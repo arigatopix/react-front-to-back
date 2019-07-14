@@ -1,11 +1,26 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../middleware/auth');
+const { check, validationResult } = require('express-validator');
+const User = require('../models/User');
+const Contact = require('../models/Contact');
 
 // @route   GET api/contacts
 // @desc    Get all users contacts
-// @access  Private : เฉพาะ user ที่ login จะดู contact ได้
-router.get('/', (req, res) => {
-  res.send('Get all contacts');
+// @access  Private : เฉพาะ user ที่ login จะดู contact ได้ .. เพิ่ม auth จาก middleware เข้าไป
+router.get('/', auth, async (req, res) => {
+  try {
+    // fetch contact จาก database แล้วเรียงอันใหม่สุดอยู่ข้างบน
+    const contacts = await Contact.find({ user: req.user.id }).sort({
+      date: -1
+    });
+
+    // send data
+    res.json(contacts);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
 });
 
 // @route   POST api/auth : ใช้ endpoint เดียวกันแต่คนละ Method
