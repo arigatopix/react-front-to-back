@@ -1,9 +1,27 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import ContactContext from '../../context/contact/contactContext';
 
 const ContactForm = () => {
   // use context
   const contactContext = useContext(ContactContext);
+
+  const { addContact, updateContact, clearCurrent, current } = contactContext;
+
+  // Click Edit Button ให้ใช้ LifeCycle ดูการเปลี่ยนแปลง state
+  useEffect(() => {
+    if (current !== null) {
+      // ถ้ากด edit ให้เปลี่ยน state เป็น current object
+      setContact(current);
+    } else {
+      // ไม่มี state.current ไม่ต้องทำไร
+      setContact({
+        name: '',
+        email: '',
+        phone: '',
+        type: 'personal'
+      });
+    }
+  }, [contactContext, current]); // ให้ useEffect เมื่อ contactContext หรือ current state เปลี่ยนไป
 
   // Set State
   const [contact, setContact] = useState({
@@ -21,23 +39,32 @@ const ContactForm = () => {
 
   // submit and update action
   const onSubmit = e => {
-    // action creator
-    contactContext.addContact(contact);
+    if (current === null) {
+      // ให้ add contact เมื่อ form เปล่า
 
-    // set form to blank
-    setContact({
-      name: '',
-      email: '',
-      phone: '',
-      type: 'personal'
-    });
+      // action creator
+      addContact(contact);
+    } else {
+      // update state (action creator)
+      updateContact(contact);
+    }
+
+    // set form to blank เรียก function
+    clearAll();
 
     e.preventDefault();
   };
 
+  // clear all from FORM
+  const clearAll = () => {
+    clearCurrent();
+  };
+
   return (
     <form onSubmit={onSubmit}>
-      <h2 className="text-primary">Add Contact</h2>
+      <h2 className="text-primary">
+        {current ? 'Edit Contact' : 'Add Contact'}
+      </h2>
       <input
         type="text"
         name="name"
@@ -65,16 +92,31 @@ const ContactForm = () => {
         name="type"
         value="personal"
         checked={type === 'personal'}
+        onChange={onChange}
       />{' '}
-      Personal <input type="radio" name="type" value="professional" />{' '}
+      Personal{' '}
+      <input
+        type="radio"
+        name="type"
+        value="professional"
+        checked={type === 'professional'}
+        onChange={onChange}
+      />{' '}
       Professional
       <div>
         <input
           type="submit"
-          value="Add Contact"
+          value={current ? 'Update Contact' : 'Add Contact'}
           className="btn btn-primary btn-block"
         />
       </div>
+      {current && (
+        <div>
+          <button className="btn btn-light btn-block" onClick={clearAll}>
+            Clear
+          </button>
+        </div>
+      )}
     </form>
   );
 };

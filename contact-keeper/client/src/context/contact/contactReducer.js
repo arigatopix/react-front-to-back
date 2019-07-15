@@ -17,6 +17,15 @@ export default (state, action) => {
         ...state,
         contacts: [...state.contacts, action.payload] // contacts array ของ initialState: [...object Contacts]
       };
+    case UPDATE_CONTACT:
+      return {
+        ...state,
+        contacts: state.contacts.map(contact =>
+          // รับ array ที่มี object มา
+          // ถ้า id ตรงก็ให้ update ทั้งหมดเป็น payload ..  ถ้าไม่ใช่ก็ให้คงเดิม
+          contact.id === action.payload.id ? action.payload : contact
+        )
+      };
     case DELETE_CONTACT:
       return {
         ...state,
