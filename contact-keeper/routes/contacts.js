@@ -78,7 +78,7 @@ router.put('/:id', auth, async (req, res) => {
   if (type) contactFields.type = type;
 
   try {
-    // หาจาก parameter /:id
+    // หาจาก contact จาก database โดยหา parameter /:id
     let contact = await Contact.findById(req.params.id);
 
     if (!contact) return res.status(400).json({ msg: 'Contact not found' });
@@ -89,7 +89,7 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(401).json({ msg: 'Not authorized' });
     }
 
-    // update in database
+    // update in database เอาของใหม่จาก contactFiedls replace ลงไปเลย
     contact = await Contact.findByIdAndUpdate(
       req.params.id,
       { $set: contactFields },
@@ -106,8 +106,26 @@ router.put('/:id', auth, async (req, res) => {
 // @route   DELETE api/auth/:id ** PUT PATCH DELETE ต้องระบุ User
 // @desc    Delete contact
 // @access  Private
-router.delete('/:id', (req, res) => {
-  res.send('Delete contact');
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    // หาจาก contact จาก database โดยหา parameter /:id
+    let contact = await Contact.findById(req.params.id);
+
+    if (!contact) return res.status(400).json({ msg: 'Contact not found' });
+
+    if (contact.user.toString() !== req.user.id) {
+      // เช็คว่า user เป็นเจ้าของ contact
+      return res.status(401).json({ msg: 'Not authorized' });
+    }
+
+    // Remove from database
+    await Contact.findByIdAndRemove(req.params.id);
+
+    res.json({ msg: 'Contact removed' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
 });
 
 module.exports = router;
