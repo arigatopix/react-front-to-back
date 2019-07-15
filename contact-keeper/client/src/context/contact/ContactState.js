@@ -39,8 +39,22 @@ const ContactState = props => {
 
   // * Actions
   // Add contact
+  const addContact = contact => {
+    // * contact มาเป็น object
+
+    // ใช้แบบ local ก็เลยให้ uuid สร้าง id ให้ไปก่อน
+    contact.id = uuid.v4();
+
+    dispatch({
+      type: ADD_CONTACT,
+      payload: contact
+    });
+  };
 
   // Delete Contact
+  const deleteContact = id => {
+    dispatch({ type: DELETE_CONTACT, payload: id });
+  };
 
   // Set Current Contact
 
@@ -53,7 +67,13 @@ const ContactState = props => {
   // Clear Filter
 
   return (
-    <ContactContext.Provider value={{ contacts: state.contacts }}>
+    <ContactContext.Provider
+      value={{
+        contacts: state.contacts,
+        addContact,
+        deleteContact
+      }}
+    >
       {props.children}
     </ContactContext.Provider>
   );
