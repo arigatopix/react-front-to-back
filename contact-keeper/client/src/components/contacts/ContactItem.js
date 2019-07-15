@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 const ContactItem = ({ contact }) => {
   const contactContext = useContext(ContactContext);
 
-  const { deleteContact } = contactContext;
+  const { deleteContact, setCurrent, clearCurrent } = contactContext;
 
   const { id, name, email, phone, type } = contact;
 
@@ -13,6 +13,8 @@ const ContactItem = ({ contact }) => {
   const onDelete = () => {
     // เมื่อกดปุ่มให้เรียก action object
     deleteContact(id);
+    // clear from state.current
+    clearCurrent();
   };
 
   return (
@@ -42,7 +44,12 @@ const ContactItem = ({ contact }) => {
         )}
       </ul>
       <p>
-        <button className="btn btn-dark btn-sm">Edit</button>
+        <button
+          className="btn btn-dark btn-sm"
+          onClick={() => setCurrent(contact)}
+        >
+          Edit
+        </button>
         <button className="btn btn-danger btn-sm" onClick={onDelete}>
           Delete
         </button>
@@ -61,4 +68,6 @@ export default ContactItem;
  * -- ทำให้ตัวอักษรตัวแรกเป็นตัวพิมพ์ใหญ่ --
  * charAt() คือเลือกตัวอักษรตัวไหน
  * slice คือเริ่มจากไหน
+ * -- EDIT button
+ * เรียก action creator แล้วส่ง object contact ไป state.current
  */

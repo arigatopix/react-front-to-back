@@ -24,6 +24,16 @@ export default (state, action) => {
           contact => contact.id !== action.payload
         ) // return array ที่ตรงกับเงื่อนไข (ลบที่ไม่ตรงเงื่อนไขออก)
       };
+    case SET_CURRENT:
+      return {
+        ...state,
+        current: action.payload // contact object
+      };
+    case CLEAR_CURRENT:
+      return {
+        ...state,
+        current: null
+      };
     default:
       return state;
   }

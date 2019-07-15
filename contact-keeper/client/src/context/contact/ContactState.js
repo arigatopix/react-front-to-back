@@ -31,7 +31,8 @@ const ContactState = props => {
         email: 'ssmith@gmail.com',
         phone: '111-111-1111'
       }
-    ]
+    ],
+    current: null // รับ object contact มาแล้วแก้ไข
   };
 
   // * Send state to Reducer
@@ -56,9 +57,15 @@ const ContactState = props => {
     dispatch({ type: DELETE_CONTACT, payload: id });
   };
 
-  // Set Current Contact
+  // Set Current Contact to Form
+  const setCurrent = contact => {
+    dispatch({ type: SET_CURRENT, payload: contact });
+  };
 
   // Clear Current Contact
+  const clearCurrent = contact => {
+    dispatch({ type: SET_CURRENT, payload: contact });
+  };
 
   // Update Contact
 
@@ -70,8 +77,11 @@ const ContactState = props => {
     <ContactContext.Provider
       value={{
         contacts: state.contacts,
+        current: state.current,
         addContact,
-        deleteContact
+        deleteContact,
+        setCurrent,
+        clearCurrent
       }}
     >
       {props.children}
