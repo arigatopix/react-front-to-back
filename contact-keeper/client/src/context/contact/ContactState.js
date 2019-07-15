@@ -16,7 +16,7 @@ import {
 
 const ContactState = props => {
   const initialState = {
-    contact: [
+    contacts: [
       {
         id: 1,
         type: 'personal',
@@ -53,7 +53,7 @@ const ContactState = props => {
   // Clear Filter
 
   return (
-    <ContactContext.Provider value={{ contact: state.contacts }}>
+    <ContactContext.Provider value={{ contacts: state.contacts }}>
       {props.children}
     </ContactContext.Provider>
   );
