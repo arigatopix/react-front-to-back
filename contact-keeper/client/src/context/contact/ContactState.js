@@ -9,6 +9,7 @@ import {
   CLEAR_CURRENT,
   UPDATE_CONTACT,
   FILTER_CONTACTS,
+  CLEAR_FILTER,
   SET_ALERT,
   CLEAR_ALERT,
   REMOVE_ALERT
@@ -32,7 +33,8 @@ const ContactState = props => {
         phone: '111-111-1111'
       }
     ],
-    current: null // รับ object contact มาแล้วแก้ไข
+    current: null, // รับ object contact มาแล้วแก้ไข
+    filtered: null
   };
 
   // * Send state to Reducer
@@ -73,19 +75,28 @@ const ContactState = props => {
   };
 
   // Filter Contacts
+  const filterContacts = text => {
+    dispatch({ type: FILTER_CONTACTS, payload: text });
+  };
 
   // Clear Filter
+  const clearFilter = () => {
+    dispatch({ type: CLEAR_FILTER });
+  };
 
   return (
     <ContactContext.Provider
       value={{
         contacts: state.contacts,
         current: state.current,
+        filtered: state.filtered,
         addContact,
         updateContact,
         deleteContact,
         setCurrent,
-        clearCurrent
+        clearCurrent,
+        filterContacts,
+        clearFilter
       }}
     >
       {props.children}
