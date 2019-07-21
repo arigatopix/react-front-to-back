@@ -48,7 +48,9 @@ const AuthState = props => {
         type: USER_LOADED,
         payload: res.data
       });
-    } catch (err) {}
+    } catch (err) {
+      dispatch({ type: AUTH_ERROR });
+    }
   };
 
   // Register User
@@ -109,7 +111,9 @@ const AuthState = props => {
   };
 
   // Logout
-  const logout = () => console.log('logout');
+  const logout = () => {
+    dispatch({ type: LOGOUT });
+  };
 
   // Clear Error มีเพื่อลบ error message ทุกครั้ง หลังจาก alert ได้แสดงผลไปแล้ว
   const clearErrors = () => dispatch({ type: CLEAR_ERRORS });

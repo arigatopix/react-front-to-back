@@ -22,7 +22,6 @@ export default (state, action) => {
     case LOGIN_SUCCESS: //ใช้ reducer เดียวกับ REGISTER_SUCCESS
       // * send token to localStorage
       localStorage.setItem('token', action.payload.token);
-      console.log(action.payload);
       return {
         ...state,
         ...action.payload, // ? มีข้อมูลมาหลายอย่าง
@@ -32,6 +31,7 @@ export default (state, action) => {
     case AUTH_ERROR: // ให้ทำเหมือนกับ REGISTER_FAIL
     case REGISTER_FAIL:
     case LOGIN_FAIL:
+    case LOGOUT:
       // remove token from localStorage
       localStorage.removeItem('token');
       return {
