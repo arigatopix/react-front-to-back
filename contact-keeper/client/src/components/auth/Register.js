@@ -1,10 +1,23 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import AlertContext from '../../context/alert/alertContext';
+import AuthContext from '../../context/auth/authContext';
 
 const Register = () => {
   const alertContext = useContext(AlertContext);
+  const authContext = useContext(AuthContext);
 
   const { setAlert } = alertContext;
+  const { register, error, clearErrors } = authContext;
+
+  useEffect(() => {
+    if (error === 'User already exists.') {
+      // error msg จาก REGISTER_FAIL
+      setAlert(error, 'danger');
+
+      // clearErrors คือให้แสดงผล error ครั้งเดียว แล้วลบออกไปเลย เพื่อรอการ submit ครั้งใหม่
+      clearErrors();
+    }
+  }, [clearErrors, error, setAlert]);
 
   const [user, setUser] = useState({
     name: '',
@@ -25,6 +38,14 @@ const Register = () => {
       setAlert('Please enter all fields', 'danger');
     } else if (password !== password2) {
       setAlert('Password do not match', 'danger');
+    } else {
+      // Action Creator ส่งไป register ที่ AuthState เป็น formData object
+      // ถ้ากรณี email ซ้ำ error message จะถูกส่งมาจาก backend (try...catch)
+      register({
+        name,
+        email,
+        password
+      });
     }
 
     console.log('Register Submit');

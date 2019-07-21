@@ -1,4 +1,5 @@
 import React, { useReducer } from 'react';
+import axios from 'axios';
 import AuthContext from './authContext';
 import authReducer from './authReducer';
 import {
@@ -25,15 +26,44 @@ const AuthState = props => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   // * Action object
-  // Load User
+  // Load User เมื่อมีการเข้าเว็บ ให้ดึง token ออกมา
+  const loadUser = () => console.log('Load user');
 
   // Register User
+  const register = async formData => {
+    const config = {
+      header: {
+        'Content-Type': 'application/json'
+      }
+    };
+
+    try {
+      // post ไป backend เอา object จาก Register component (formData)
+      const res = await axios.post('/api/users', formData, config);
+
+      // update state
+      dispatch({
+        type: REGISTER_SUCCESS,
+        payload: res.data
+      });
+    } catch (err) {
+      // err จะมาจาก backend (msg)
+      dispatch({
+        type: REGISTER_FAIL,
+        payload: err.response.data.msg
+        // รับ msg จาก backend (users.js)
+      });
+    }
+  };
 
   // Login User
+  const login = () => console.log('login');
 
   // Logout
+  const logout = () => console.log('logout');
 
-  // Clear Error
+  // Clear Error มีเพื่อลบ error message ทุกครั้ง หลังจาก alert ได้แสดงผลไปแล้ว
+  const clearErrors = () => dispatch({ type: CLEAR_ERRORS });
 
   return (
     <AuthContext.Provider
@@ -42,7 +72,12 @@ const AuthState = props => {
         isAuthenticated: state.isAuthenticated,
         loading: state.loading,
         user: state.user,
-        error: state.error
+        error: state.error,
+        loadUser,
+        register,
+        login,
+        logout,
+        clearErrors
       }}
     >
       {props.children}
