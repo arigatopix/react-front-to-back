@@ -82,7 +82,31 @@ const AuthState = props => {
   };
 
   // Login User
-  const login = () => console.log('login');
+  const login = async formData => {
+    const config = {
+      header: {
+        'Content-Type': 'application/json'
+      }
+    };
+
+    try {
+      // fetch data from backend
+      const res = await axios.post('/api/auth', formData, config);
+
+      // update state
+      dispatch({
+        type: LOGIN_SUCCESS,
+        payload: res.data
+      });
+
+      loadUser();
+    } catch (err) {
+      dispatch({
+        type: LOGIN_FAIL,
+        payload: err.response.data.msg
+      });
+    }
+  };
 
   // Logout
   const logout = () => console.log('logout');
