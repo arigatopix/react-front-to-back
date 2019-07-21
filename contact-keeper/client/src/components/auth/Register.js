@@ -2,14 +2,20 @@ import React, { useState, useContext, useEffect } from 'react';
 import AlertContext from '../../context/alert/alertContext';
 import AuthContext from '../../context/auth/authContext';
 
-const Register = () => {
+const Register = props => {
   const alertContext = useContext(AlertContext);
   const authContext = useContext(AuthContext);
 
   const { setAlert } = alertContext;
-  const { register, error, clearErrors } = authContext;
+  const { register, error, clearErrors, isAuthenticated } = authContext;
 
   useEffect(() => {
+    // หลังจาก reigster เสร็จ แล้วมีการเปลี่ยนแปลง state (isAuthenticated จาก null เป็น true) ให้ redirect
+    if (isAuthenticated) {
+      // history มาจาก BrowserRouter เพื่อเช็ค url ใน browser
+      props.history.push('/');
+    }
+
     if (error === 'User already exists.') {
       // error msg จาก REGISTER_FAIL
       setAlert(error, 'danger');
@@ -17,7 +23,8 @@ const Register = () => {
       // clearErrors คือให้แสดงผล error ครั้งเดียว แล้วลบออกไปเลย เพื่อรอการ submit ครั้งใหม่
       clearErrors();
     }
-  }, [clearErrors, error, setAlert]);
+    // eslint-disable-next-line
+  }, [error, isAuthenticated, props.history]);
 
   const [user, setUser] = useState({
     name: '',

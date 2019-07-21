@@ -10,6 +10,12 @@ import Navbar from './components/layout/Navbar';
 import Alerts from './components/layout/Alerts';
 import Register from './components/auth/Register';
 import Login from './components/auth/Login';
+import setAuthToken from './utils/setAuthToken';
+
+// ** Load token ทุกครั้งที่มีการเข้า App โดยเอามาจาก localStorage
+if (localStorage.token) {
+  setAuthToken(localStorage.token);
+}
 
 const App = () => {
   return (

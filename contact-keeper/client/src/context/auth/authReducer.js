@@ -11,15 +11,24 @@ import {
 
 export default (state, action) => {
   switch (action.type) {
+    case USER_LOADED:
+      return {
+        ...state,
+        isAuthenticated: true,
+        loading: false,
+        user: action.payload
+      };
     case REGISTER_SUCCESS:
-      // send token to localStorage
-      localStorage.setItem('token', action.payload);
+      // * send token to localStorage
+      localStorage.setItem('token', action.payload.token);
+      console.log(action.payload);
       return {
         ...state,
         ...action.payload, // ? มีข้อมูลมาหลายอย่าง
         isAuthenticated: true,
         loading: false
       };
+    case AUTH_ERROR: // ให้ทำเหมือนกับ REGISTER_FAIL
     case REGISTER_FAIL:
       // remove token from localStorage
       localStorage.removeItem('token');

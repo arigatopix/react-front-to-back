@@ -1,5 +1,6 @@
 import React, { useReducer } from 'react';
 import axios from 'axios';
+import setAuthToken from '../../utils/setAuthToken';
 import AuthContext from './authContext';
 import authReducer from './authReducer';
 import {
@@ -26,8 +27,29 @@ const AuthState = props => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   // * Action object
-  // Load User เมื่อมีการเข้าเว็บ ให้ดึง token ออกมา
-  const loadUser = () => console.log('Load user');
+  // Load User : เมื่อมีการเข้าเว็บ ให้เอา token ไปไว้ global headers และ  fetch user
+  const loadUser = async () => {
+    // load token into global headers
+    // หลังจาก register และมี token แล้วให้เก็บ token ไว้ทุกที่ เพราะบาง route ใน backend ต้องการ token
+    if (localStorage.token) {
+      // เช็ค token ใน localStotrage ถ้าไม่มีให้ redirect
+
+      // ส่งไปให้ global header
+      setAuthToken(localStorage.token);
+    }
+
+    try {
+      // *** จะต้องมี token เท่านั้นถึงจะ fetch ข้อมูลได้ จึงต้องกำหนด token ไว้กับ header ก่อน
+      // แปลว่าจะต้อง register เข้ามา แล้ว fetch user จาก backend
+      const res = await axios.get('/api/auth');
+
+      // ส่ง user ให้ payload
+      dispatch({
+        type: USER_LOADED,
+        payload: res.data
+      });
+    } catch (err) {}
+  };
 
   // Register User
   const register = async formData => {
@@ -46,6 +68,9 @@ const AuthState = props => {
         type: REGISTER_SUCCESS,
         payload: res.data
       });
+
+      // หลังจาก register ก็ให้ loadUser เพื่อเก็บ token ไว้ใน global header
+      loadUser();
     } catch (err) {
       // err จะมาจาก backend (msg)
       dispatch({
