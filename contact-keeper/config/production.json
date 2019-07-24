@@ -1,0 +1,4 @@
+{
+  "mongoURI": "mongodb+srv://arigatopix:arigatopix@contactkeeper-5i8xq.mongodb.net/test?retryWrites=true&w=majority",
+  "jwtSecret": "secret"
+}
