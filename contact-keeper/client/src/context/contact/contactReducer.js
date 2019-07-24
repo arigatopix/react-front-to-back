@@ -22,7 +22,7 @@ export default (state, action) => {
     case ADD_CONTACT:
       return {
         ...state,
-        contacts: [...state.contacts, action.payload], // contacts array ของ initialState: [...object Contacts]
+        contacts: [action.payload, ...state.contacts], // contacts array ของ initialState: [...object Contacts] // action.payload, ... ช่วยเรียงลำดับในการแสดงผล
         loading: false
       };
     case UPDATE_CONTACT:
@@ -38,7 +38,7 @@ export default (state, action) => {
       return {
         ...state,
         contacts: state.contacts.filter(
-          contact => contact.id !== action.payload
+          contact => contact._id !== action.payload
         ), // return array ที่ตรงกับเงื่อนไข (ลบที่ไม่ตรงเงื่อนไขออก)
         loading: false
       };

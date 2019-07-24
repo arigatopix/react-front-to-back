@@ -7,12 +7,13 @@ const ContactItem = ({ contact }) => {
 
   const { deleteContact, setCurrent, clearCurrent } = contactContext;
 
-  const { id, name, email, phone, type } = contact;
+  const { _id, name, email, phone, type } = contact;
+  // _id เพราะมาจาก mongodb
 
   // delete item action creator
   const onDelete = () => {
     // เมื่อกดปุ่มให้เรียก action object
-    deleteContact(id);
+    deleteContact(_id);
     // clear from state.current
     clearCurrent();
   };
