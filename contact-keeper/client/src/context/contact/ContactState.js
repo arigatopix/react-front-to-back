@@ -17,10 +17,11 @@ import {
 
 const ContactState = props => {
   const initialState = {
-    contacts: [],
+    contacts: null, //  initState เปลี่ยนเป็น null แทน เพื่อให้แสดง Spinner
     current: null, // รับ object contact มาแล้วแก้ไข
     filtered: null,
-    error: null
+    error: null,
+    loading: true
   };
 
   // * Send state to Reducer
@@ -28,6 +29,21 @@ const ContactState = props => {
 
   // * Actions
   // Get contacts
+  const getContacts = async () => {
+    try {
+      const res = await axios.get('/api/contacts');
+
+      dispatch({
+        type: GET_CONTACTS,
+        payload: res.data
+      });
+    } catch (err) {
+      dispatch({
+        type: CONTACT_ERROR,
+        payload: err.response.msg
+      });
+    }
+  };
 
   // Clear contacts
 
@@ -94,6 +110,8 @@ const ContactState = props => {
         current: state.current,
         filtered: state.filtered,
         error: state.error,
+        loading: state.loading,
+        getContacts,
         addContact,
         updateContact,
         deleteContact,

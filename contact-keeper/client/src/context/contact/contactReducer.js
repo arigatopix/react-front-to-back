@@ -13,10 +13,17 @@ import {
 
 export default (state, action) => {
   switch (action.type) {
+    case GET_CONTACTS:
+      return {
+        ...state,
+        contacts: action.payload,
+        loading: false
+      };
     case ADD_CONTACT:
       return {
         ...state,
-        contacts: [...state.contacts, action.payload] // contacts array ของ initialState: [...object Contacts]
+        contacts: [...state.contacts, action.payload], // contacts array ของ initialState: [...object Contacts]
+        loading: false
       };
     case UPDATE_CONTACT:
       return {
@@ -32,7 +39,8 @@ export default (state, action) => {
         ...state,
         contacts: state.contacts.filter(
           contact => contact.id !== action.payload
-        ) // return array ที่ตรงกับเงื่อนไข (ลบที่ไม่ตรงเงื่อนไขออก)
+        ), // return array ที่ตรงกับเงื่อนไข (ลบที่ไม่ตรงเงื่อนไขออก)
+        loading: false
       };
     case SET_CURRENT:
       return {
