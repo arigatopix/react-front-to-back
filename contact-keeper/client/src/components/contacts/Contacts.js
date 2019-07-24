@@ -19,14 +19,14 @@ const Contacts = () => {
           ? filtered.map((
               contact // ค้นหา contact
             ) => (
-              <CSSTransition key={contact.id} timeout={200}>
+              <CSSTransition key={contact._id} timeout={200}>
                 <ContactItem contact={contact} key={contact.id} />
               </CSSTransition>
             ))
           : contacts.map((
               contact // Show contacts
             ) => (
-              <CSSTransition key={contact.id} timeout={500}>
+              <CSSTransition key={contact._id} timeout={500}>
                 <ContactItem contact={contact} key={contact.id} />
               </CSSTransition>
             ))}

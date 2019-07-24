@@ -1,9 +1,12 @@
 import React, { useReducer } from 'react';
-import uuid from 'uuid';
+import axios from 'axios';
 import ContactContext from './contactContext';
 import ContactReducer from './contactReducer';
 import {
   ADD_CONTACT,
+  GET_CONTACTS,
+  CLEAR_CONTACTS,
+  CONTACT_ERROR,
   DELETE_CONTACT,
   SET_CURRENT,
   CLEAR_CURRENT,
@@ -14,41 +17,44 @@ import {
 
 const ContactState = props => {
   const initialState = {
-    contacts: [
-      {
-        id: 1,
-        type: 'personal',
-        name: 'Sara White',
-        email: 'swhite@gmail.com',
-        phone: '333-333-3333'
-      },
-      {
-        id: 2,
-        type: 'professional',
-        name: 'Sam Smith',
-        email: 'ssmith@gmail.com',
-        phone: '111-111-1111'
-      }
-    ],
+    contacts: [],
     current: null, // รับ object contact มาแล้วแก้ไข
-    filtered: null
+    filtered: null,
+    error: null
   };
 
   // * Send state to Reducer
   const [state, dispatch] = useReducer(ContactReducer, initialState);
 
   // * Actions
+  // Get contacts
+
+  // Clear contacts
+
   // Add contact
-  const addContact = contact => {
+  const addContact = async contact => {
     // * contact มาเป็น object
 
-    // ใช้แบบ local ก็เลยให้ uuid สร้าง id ให้ไปก่อน
-    contact.id = uuid.v4();
+    const config = {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
 
-    dispatch({
-      type: ADD_CONTACT,
-      payload: contact
-    });
+    try {
+      const res = await axios.post('/api/contacts', contact, config);
+      // ไม่ต้องกังวลเรื่อง token เพราะเรา set header ไว้แล้ว
+
+      dispatch({
+        type: ADD_CONTACT,
+        payload: res.data
+      });
+    } catch (err) {
+      dispatch({
+        type: CONTACT_ERROR,
+        payload: err.response.msg
+      });
+    }
   };
 
   // Delete Contact
@@ -87,6 +93,7 @@ const ContactState = props => {
         contacts: state.contacts,
         current: state.current,
         filtered: state.filtered,
+        error: state.error,
         addContact,
         updateContact,
         deleteContact,
