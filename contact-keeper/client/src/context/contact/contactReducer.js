@@ -42,6 +42,14 @@ export default (state, action) => {
         ), // return array ที่ตรงกับเงื่อนไข (ลบที่ไม่ตรงเงื่อนไขออก)
         loading: false
       };
+    case CLEAR_CONTACTS:
+      return {
+        ...state,
+        contacts: null,
+        filtered: null,
+        error: null,
+        current: null
+      };
     case SET_CURRENT:
       return {
         ...state,

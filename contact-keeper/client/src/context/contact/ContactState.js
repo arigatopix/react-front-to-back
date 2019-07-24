@@ -45,7 +45,12 @@ const ContactState = props => {
     }
   };
 
-  // Clear contacts
+  // Clear contacts: เอาไว้ตอนกด logout แล้ว reset initState ทั้งหมด
+  const clearContact = () => {
+    dispatch({
+      type: CLEAR_CONTACTS
+    });
+  };
 
   // Add contact
   const addContact = async contact => {
@@ -118,7 +123,8 @@ const ContactState = props => {
         setCurrent,
         clearCurrent,
         filterContacts,
-        clearFilter
+        clearFilter,
+        clearContact
       }}
     >
       {props.children}

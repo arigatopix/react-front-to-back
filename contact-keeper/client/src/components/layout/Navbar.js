@@ -2,13 +2,23 @@ import React, { Fragment, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import AuthContext from '../../context/auth/authContext';
+import ContactContext from '../../context/contact/contactContext';
 
 const Navbar = ({ title, icon }) => {
   const authContext = useContext(AuthContext);
+  const contactContext = useContext(ContactContext);
 
   const { isAuthenticated, logout, user } = authContext;
+  const { clearContact } = contactContext;
 
-  const onLogout = () => logout();
+  const onLogout = () => {
+    // logout action
+    logout();
+
+    // clear contact เวลา logout แล้ว login user อื่น มันจะมี cache แล้วจะเห็นการแสดงผล
+    // จึงต้อง clear state ทั้งหมด ให้อยู่ใน initState null แทบทั้งหมด
+    clearContact();
+  };
 
   // แยกการแสดงผล ให้ชัดเลย ว่า login รึเปล่า
   const authLinks = (
